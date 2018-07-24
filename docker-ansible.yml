@@ -1,0 +1,30 @@
+---
+- name: Install docker
+  gather_facts: No
+  hosts: database
+  become: yes
+
+  tasks:
+    - name: Installing Required packages
+      yum: name={{ item }} state=latest
+      with_items:
+         - yum-utils
+         - device-mapper-persistent-data
+         - lvm2
+    - name: Add Docker repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docer-ce.repo
+    - name: Install Docker
+      package:
+        name: docker-ce
+        state: latest
+      become: yes
+
+    - name: Start Docker service
+      service: name=docker state=started enabled=yes
+    - name: Add user to docker group
+      user:
+        name: saurav1993v
+        groups: docker
+        append: yes
